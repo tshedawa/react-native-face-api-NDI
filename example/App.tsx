@@ -1,5 +1,5 @@
 import React from 'react'
-import { SafeAreaView, StyleSheet, View, Button, Text, Image, Alert, TouchableOpacity, Platform, NativeEventEmitter } from 'react-native'
+import { SafeAreaView, StyleSheet, View, Button, Text, Image, Alert, TouchableOpacity, Platform, NativeEventEmitter, TextInput } from 'react-native'
 import { launchImageLibrary } from 'react-native-image-picker'
 import * as RNFS from 'react-native-fs'
 import FaceSDK, { Enum, FaceCaptureResponse, LivenessResponse, MatchFacesResponse, MatchFacesRequest, MatchFacesImage, ComparedFacesSplit, InitConfig, InitResponse, LivenessSkipStep, SearchPerson, RNFaceApi, LivenessNotification } from '@regulaforensics/react-native-face-api'
@@ -132,6 +132,9 @@ export default class App extends React.Component<IProps, IState> {
   render() {
     return (
       <SafeAreaView style={styles.container}>
+      <View style={{ width: "100%", alignItems: "center" }}>
+        <TextInput style={{ width: "80%", height: 40, borderColor: "gray", borderWidth: 1, marginBottom: 10 }} placeholder="Enter your name" onChangeText={text => this.setState({ name: text })} />
+      </View>
 
         <View style={{ padding: 15 }}>
           <TouchableOpacity onPress={() => this.pickImage(true)} style={{ alignItems: "center" }}>
