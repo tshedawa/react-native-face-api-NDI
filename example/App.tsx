@@ -1,8 +1,9 @@
 import React from 'react'
-import { SafeAreaView, StyleSheet, View, Button, Text, Image, Alert, TouchableOpacity, Platform, NativeEventEmitter } from 'react-native'
+import { SafeAreaView, StyleSheet, View, Button, Text, Image, Alert, TouchableOpacity, Platform, NativeEventEmitter, Modal, TextInput, KeyboardAvoidingView } from 'react-native'
 import { launchImageLibrary } from 'react-native-image-picker'
 import * as RNFS from 'react-native-fs'
-import FaceSDK, { Enum, FaceCaptureResponse, LivenessResponse, MatchFacesResponse, MatchFacesRequest, MatchFacesImage, ComparedFacesSplit, InitConfig, InitResponse, LivenessSkipStep, SearchPerson, RNFaceApi, LivenessNotification } from '@regulaforensics/react-native-face-api'
+import FaceSDK, { Enum, FaceCaptureResponse, LivenessResponse, MatchFacesResponse, MatchFacesRequest, MatchFacesImage, ComparedFacesSplit, InitConfig, InitResponse, LivenessSkipStep, LivenessNotification, RNFaceApi } from '@regulaforensics/react-native-face-api'
+import { Ionicons } from "@expo/vector-icons"; // Install @expo/vector-icons if needed
 
 interface IProps {
 }
@@ -12,6 +13,8 @@ interface IState {
   img2: any
   similarity: string
   liveness: string
+  modalVisible: boolean
+  reportText: string
 }
 
 var image1 = new MatchFacesImage()
@@ -51,7 +54,9 @@ export default class App extends React.Component<IProps, IState> {
       img1: require('./images/portrait.png'),
       img2: require('./images/portrait.png'),
       similarity: "nil",
-      liveness: "nil"
+      liveness: "nil",
+      modalVisible: false,
+      reportText: ''
     }
   }
 
@@ -128,6 +133,9 @@ export default class App extends React.Component<IProps, IState> {
       }
     }, _e => { })
   }
+ toggleModal = () => {
+    this.setState({ modalVisible: !this.state.modalVisible });
+  };
 
   render() {
     return (
@@ -152,6 +160,9 @@ export default class App extends React.Component<IProps, IState> {
           <View style={{ padding: 3, width: "60%" }}>
             <Button title="Clear" color="#4285F4" onPress={() => { this.clearResults() }} />
           </View>
+          <View style={{ padding: 3, width: "60%" }}>
+            <Button title="Report Issue" color="#FF5733" onPress={() => this.toggleModal()} />
+          </View>
         </View>
 
         <View style={{ flexDirection: 'row', padding: 10 }}>
@@ -159,6 +170,30 @@ export default class App extends React.Component<IProps, IState> {
           <View style={{ padding: 10 }} />
           <Text>Liveness: {this.state.liveness}</Text>
         </View>
+
+        <Button title="Open Keyboard" onPress={this.toggleModal} color="#4285F4" />
+        
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={this.state.modalVisible}
+          onRequestClose={this.toggleModal}
+        >
+          <KeyboardAvoidingView style={styles.modalView} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Enter Text</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Type something..."
+                value={this.state.inputText}
+                onChangeText={(text) => this.setState({ inputText: text })}
+                autoFocus
+              />
+              <Button title="Close" color="#F44336" onPress={this.toggleModal} />
+            </View>
+          </KeyboardAvoidingView>
+        </Modal>
+
       </SafeAreaView>
     )
   };
@@ -174,4 +209,31 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5FCFF',
     marginBottom: 12,
   },
+  modalView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    width: '80%',
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  input: {
+    width: '100%',
+    height: 100,
+    borderColor: 'gray',
+    borderWidth: 1,
+    padding: 10,
+    marginBottom: 20,
+    textAlignVertical: 'top',
+  }
 });
